@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>BIZO — Know your sales. Track your cash.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #0F6B45;
+    --green-light: #E6F2EC;
+    --danger: #A6093D;
+    --danger-light: #FBE7EC;
+    --paper: #F7F4EC;
+    --paper-line: #E4DFD0;
+    --card: #FFFFFF;
+    --ink: #17231C;
+    --ink-soft: #5B6660;
+    --ink-faint: #8A9089;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --green: #2E9E6B;
+      --green-light: #173D2A;
+      --danger: #E24C73;
+      --danger-light: #3D1A24;
+      --paper: #12140F;
+      --paper-line: #2A2D24;
+      --card: #1B1E17;
+      --ink: #F2F3EE;
+      --ink-soft: #A6ADA2;
+      --ink-faint: #6B7169;
+    }
+  }
+  :root[data-theme="dark"] {
+    --green: #2E9E6B;
+    --green-light: #173D2A;
+    --danger: #E24C73;
+    --danger-light: #3D1A24;
+    --paper: #12140F;
+    --paper-line: #2A2D24;
+    --card: #1B1E17;
+    --ink: #F2F3EE;
+    --ink-soft: #A6ADA2;
+    --ink-faint: #6B7169;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  img { max-width: 100%; display: block; }
+  .scrollx { overflow-x: auto; }
+
+  /* ---------- Nav ---------- */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--paper-line);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1080px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; }
+  .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+  .nav-links { display: flex; gap: 28px; font-size: 14px; color: var(--ink-soft); font-weight: 500; }
+  .nav-links a:hover { color: var(--ink); }
+  @media (max-width: 640px) { .nav-links { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green); color: #fff; font-weight: 600; font-size: 15px;
+    padding: 13px 22px; border-radius: 999px; border: none; cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -6px color-mix(in srgb, var(--green) 55%, transparent); }
+  .btn-ghost {
+    background: transparent; color: var(--ink); border: 1.5px solid var(--paper-line);
+  }
+  .btn-ghost:hover { border-color: var(--green); color: var(--green); box-shadow: none; transform: none; }
+  .btn-sm { padding: 9px 16px; font-size: 13px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 56px 0 40px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center; }
+  @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+  .receipt-edge {
+    height: 14px;
+    background: repeating-linear-gradient(-45deg, var(--card) 0 8px, transparent 8px 16px);
+    margin-top: -1px;
+  }
+
+  .eyebrow-line { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .eyebrow-line .rule { width: 28px; height: 2px; background: var(--green); }
+  .eyebrow-line span { font-size: 13px; color: var(--ink-soft); font-weight: 600; }
+
+  h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.06; letter-spacing: -0.025em; margin: 0 0 20px; font-weight: 800; }
+  h1 em { font-style: normal; color: var(--green); }
+  .lede { font-size: 18px; color: var(--ink-soft); max-width: 46ch; margin: 0 0 30px; }
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .hero-note { font-size: 13px; color: var(--ink-faint); max-width: 40ch; }
+
+  /* ---------- Phone mockup ---------- */
+  .phone-stage { position: relative; display: flex; justify-content: center; }
+  .phone {
+    width: 260px; background: var(--card); border-radius: 34px;
+    border: 8px solid var(--ink); box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35);
+    overflow: hidden; position: relative;
+  }
+  .phone::before {
+    content: ""; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    width: 70px; height: 5px; border-radius: 3px; background: var(--ink); z-index: 5;
+  }
+  .screen { padding: 30px 16px 18px; background: var(--paper); }
+  .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .app-title { color: var(--green); font-weight: 800; font-size: 17px; }
+  .avatar-dot { width: 22px; height: 22px; border-radius: 50%; background: var(--paper-line); }
+  .greet { font-size: 15px; font-weight: 700; margin: 0 0 2px; }
+  .greet-sub { font-size: 11px; color: var(--ink-soft); margin: 0 0 12px; }
+  .biz-card { background: var(--card); border-radius: 16px; padding: 14px; box-shadow: 0 6px 16px -8px rgba(0,0,0,0.15); }
+  .biz-label { font-size: 9px; letter-spacing: 0.06em; color: var(--ink-faint); font-weight: 700; }
+  .biz-net { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px; color: var(--green); margin: 4px 0 10px; }
+  .biz-stats { display: flex; justify-content: space-between; border-top: 1px solid var(--paper-line); padding-top: 8px; }
+  .stat-label { font-size: 9px; color: var(--ink-faint); }
+  .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; margin-top: 2px; }
+  .pill-row { display: flex; gap: 6px; margin: 12px 0; }
+  .pill { flex: 1; text-align: center; font-size: 10px; font-weight: 700; padding: 9px 0; border-radius: 999px; }
+  .pill.solid { background: var(--green); color: #fff; }
+  .pill.line { border: 1.3px solid var(--green); color: var(--green); }
+  .activity-row { display: flex; justify-content: space-between; align-items: center; background: var(--card); border-radius: 12px; padding: 10px 12px; font-size: 10px; margin-top: 4px; }
+  .activity-name { font-weight: 700; }
+  .activity-tag { color: var(--ink-faint); font-size: 9px; }
+  .amt-pos { font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 700; font-size: 11px; }
+
+  /* second phone: reports */
+  .rep-pills { display: flex; gap: 5px; margin-bottom: 10px; }
+  .rep-pill { font-size: 9px; padding: 6px 9px; border-radius: 999px; background: var(--card); color: var(--ink-soft); font-weight: 600; }
+  .rep-pill.on { background: var(--green); color: #fff; }
+  .bars { display: flex; align-items: flex-end; gap: 5px; height: 54px; margin: 10px 0 4px; }
+  .bar { flex: 1; background: var(--green); border-radius: 3px 3px 0 0; opacity: 0.85; }
+  .insight { background: var(--card); border-left: 3px solid var(--green); border-radius: 8px; padding: 8px 10px; font-size: 9.5px; margin-top: 8px; color: var(--ink-soft); }
+
+  .float-badge {
+    position: absolute; background: var(--card); border-radius: 14px; padding: 10px 14px;
+    box-shadow: 0 14px 30px -12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700;
+  }
+  .float-1 { top: 8%; left: -8%; }
+  .float-2 { bottom: 12%; right: -10%; }
+  @media (max-width: 640px) { .float-badge { display: none; } }
+  .badge-icon { width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0; }
+  .section-head { max-width: 640px; margin: 0 0 48px; }
+  .section-head .eyebrow-line { margin-bottom: 14px; }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.02em; margin: 0 0 12px; font-weight: 800; }
+  .section-head p { color: var(--ink-soft); font-size: 16px; max-width: 52ch; margin: 0; }
+
+  .feature-row { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; padding: 40px 0; border-top: 1px solid var(--paper-line); }
+  .feature-row:first-of-type { border-top: none; }
+  .feature-row.reverse .feature-copy { order: 2; }
+  @media (max-width: 780px) { .feature-row, .feature-row.reverse .feature-copy { grid-template-columns: 1fr; order: initial; } .feature-row { display: block; } .feature-row.reverse .feature-copy { order: 0; } }
+  .feature-copy h3 { font-size: 21px; margin: 0 0 10px; font-weight: 700; letter-spacing: -0.01em; }
+  .feature-copy p { color: var(--ink-soft); font-size: 15px; max-width: 42ch; margin: 0; }
+  .feature-visual { background: var(--card); border: 1px solid var(--paper-line); border-radius: 18px; padding: 22px; }
+
+  /* mini demo widgets inside feature visuals */
+  .demo-offline { display: flex; gap: 10px; align-items: center; }
+  .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .demo-list-row { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 0; border-bottom: 1px solid var(--paper-line); }
+  .demo-list-row:last-child { border-bottom: none; }
+  .demo-list-row .amt { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  .theme-toggle-demo { display: flex; gap: 6px; background: var(--paper); border-radius: 999px; padding: 4px; width: fit-content; }
+  .theme-opt { font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 999px; color: var(--ink-faint); }
+  .theme-opt.active { background: var(--green); color: #fff; }
+  .biz-switch-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--paper-line); font-size: 13px; font-weight: 600; }
+  .biz-switch-row:last-child { border-bottom: none; }
+  .check-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+  /* ---------- How it works ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 780px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: var(--card); border: 1px solid var(--paper-line); border-radius: 18px; padding: 28px 24px; }
+  .step-num { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); font-weight: 700; margin-bottom: 14px; }
+  .step h3 { font-size: 17px; margin: 0 0 8px; font-weight: 700; }
+  .step p { font-size: 14px; color: var(--ink-soft); margin: 0; }
+
+  /* ---------- Download CTA ---------- */
+  .cta-block {
+    background: var(--ink); color: var(--paper); border-radius: 26px;
+    padding: 56px 40px; text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-block::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 12px;
+    background: repeating-linear-gradient(-45deg, var(--paper) 0 8px, transparent 8px 16px);
+  }
+  .cta-block h2 { color: var(--paper); }
+  .cta-block p { color: color-mix(in srgb, var(--paper) 70%, transparent); max-width: 46ch; margin: 0 auto 28px; }
+  .cta-block .btn { background: var(--green); }
+  .cta-fineprint { margin-top: 20px; font-size: 12.5px; color: color-mix(in srgb, var(--paper) 55%, transparent); }
+  .cta-fineprint a { text-decoration: underline; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--paper-line); padding: 32px 0 40px; }
+  .foot-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--ink-faint); }
+  .foot-links { display: flex; gap: 20px; }
+  .foot-links a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="brand"><span class="dot"></span>BIZO</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#download">Download</a>
+    </div>
+    <a href="#download" class="btn btn-sm">Get the app</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow-line"><span class="rule"></span><span>For shop owners, vendors & freelancers</span></div>
+        <h1>Know your sales.<br>Track your cash.<br><em>Understand your business.</em></h1>
+        <p class="lede">BIZO turns your daily sales and expenses into a clear picture of how your business is really doing — even when you're offline, even with staff helping out.</p>
+        <div class="hero-ctas">
+          <a class="btn" href="https://github.com/gentino/cashlog/releases/tag/utility">Download for Android</a>
+          <a class="btn btn-ghost" href="#features">See what it does</a>
+        </div>
+        <p class="hero-note">Free to use. Works fully offline. Not yet on Google Play — direct download while we get there.</p>
+      </div>
+
+      <div class="phone-stage">
+        <div class="phone">
+          <div class="screen">
+            <div class="app-header"><span class="app-title">Dashboard</span><div class="avatar-dot"></div></div>
+            <p class="greet">Good morning, Amaka 👋</p>
+            <p class="greet-sub">Friday, September 25</p>
+            <div class="biz-card">
+              <div class="biz-label">TODAY'S BUSINESS</div>
+              <div class="biz-net">₦69,500</div>
+              <div class="biz-stats">
+                <div><div class="stat-label">Sales</div><div class="stat-val" style="color:var(--green)">₦85,000</div></div>
+                <div><div class="stat-label">Expenses</div><div class="stat-val" style="color:var(--danger)">₦15,500</div></div>
+              </div>
+            </div>
+            <div class="pill-row">
+              <div class="pill solid">+ Add Sale</div>
+              <div class="pill line">− Add Expense</div>
+            </div>
+            <div class="activity-row">
+              <div><div class="activity-name">Hair Treatment</div><div class="activity-tag">Transfer</div></div>
+              <div class="amt-pos">+₦15,000</div>
+            </div>
+          </div>
+        </div>
+        <div class="float-badge float-1">
+          <div class="badge-icon" style="background:var(--green-light)">📶</div>
+          Works offline
+        </div>
+        <div class="float-badge float-2">
+          <div class="badge-icon" style="background:var(--danger-light)">🧾</div>
+          PDF reports
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-head">
+      <div class="eyebrow-line"><span class="rule"></span><span>Built for how business actually happens</span></div>
+      <h2>Not another spreadsheet.</h2>
+      <p>BIZO is built around the realities of running a cash-based business — patchy internet, shared staff, and needing answers fast, not a finance degree.</p>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-copy">
+        <h3>Never lose a sale to bad network</h3>
+        <p>Log a sale or expense with zero connection. It saves instantly and quietly syncs the moment you're back online — no waiting, no lost entries, no visible difference at all.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="demo-offline">
+          <div class="demo-dot" style="background:var(--danger)"></div>
+          <span style="font-size:13px;font-weight:600">No internet connection</span>
+        </div>
+        <div style="margin-top:16px">
+          <div class="demo-list-row"><span>Fabric — Cash</span><span class="amt" style="color:var(--green)">+₦8,000</span></div>
+          <div class="demo-list-row"><span>Generator fuel</span><span class="amt" style="color:var(--danger)">−₦4,500</span></div>
+          <div class="demo-list-row"><span>Customer deposit — Transfer</span><span class="amt" style="color:var(--green)">+₦22,000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-copy">
+        <h3>Reports that actually tell you something</h3>
+        <p>Not just totals — real business insights: your best sales day, where your money's going, and how this week compares to last. Export the whole thing as a clean PDF.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="rep-pills">
+          <div class="rep-pill on">This Week</div>
+          <div class="rep-pill">This Month</div>
+          <div class="rep-pill">Custom</div>
+        </div>
+        <div class="bars">
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:65%"></div>
+          <div class="bar" style="height:30%"></div>
+          <div class="bar" style="height:85%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:100%"></div>
+          <div class="bar" style="height:48%"></div>
+        </div>
+        <div class="insight">📈 Sales increased 18% compared with last week.</div>
+      </div>
+    </div>
+
+    <div class="feature-row">
+      <div class="feature-copy">
+        <h3>Run more than one business, easily</h3>
+        <p>Switch between businesses in one tap. Invite trusted staff to log sales without giving them access to edit records, manage money, or see everything you can.</p>
+      </div>
+      <div class="feature-visual">
+        <div class="biz-switch-row"><span>Amaka's Salon</span><div class="check-dot">✓</div></div>
+        <div class="biz-switch-row"><span>Amaka Fabrics (Mile 12)</span></div>
+        <div class="biz-switch-row" style="color:var(--green);font-weight:700">+ Add another business</div>
+      </div>
+    </div>
+
+    <div class="feature-row reverse">
+      <div class="feature-copy">
+        <h3>Easy on the eyes, day or night</h3>
+        <p>Counting cash at 6am or closing up at 9pm — BIZO follows your phone's theme, or you can lock it to light or dark yourself.</p>
+      </div>
+      <div class="feature-visual">
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;font-weight:600">Appearance</p>
+        <div class="theme-toggle-demo">
+          <div class="theme-opt">Light</div>
+          <div class="theme-opt active">Dark</div>
+          <div class="theme-opt">System</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="section-head">
+      <div class="eyebrow-line"><span class="rule"></span><span>Getting started</span></div>
+      <h2>Up and running in a few minutes.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Download & create an account</h3>
+        <p>Just a business name, phone or email, and a password. No bank details, no setup wizard.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Log sales & expenses as they happen</h3>
+        <p>One tap from the dashboard. Add a payment method and category, and you're done.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Check your reports whenever you like</h3>
+        <p>Daily, weekly, or monthly — see exactly how the business is doing, and export it if you need to share it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD CTA -->
+  <section id="download">
+    <div class="cta-block">
+      <h2>Ready to see where your money's going?</h2>
+      <p>Free to download and use. Currently available as a direct Android install while we prepare for the Play Store.</p>
+      <a class="btn" href="https://github.com/gentino/cashlog/releases/tag/utility">Download BIZO for Android</a>
+      <p class="cta-fineprint">By downloading, you agree to our <a href="https://claude.ai/artifact/C7uV61aypu4JgatAjctBbP">Privacy Policy</a>. First load may take a moment to connect — the server wakes up on request.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <span>© 2026 BIZO. Built with React Native, Django & PostgreSQL.</span>
+    <div class="foot-links">
+      <a href="https://claude.ai/artifact/C7uV61aypu4JgatAjctBbP">Privacy Policy</a>
+      <a href="https://github.com/gentino/cashlog">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
